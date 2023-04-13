@@ -3,6 +3,7 @@
 namespace Tests\Feature\Controllers;
 
 use App\Models\User;
+use Database\Seeders\UserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Testing\Fluent\AssertableJson;
@@ -15,19 +16,7 @@ class AuthControllerTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $listFakeUser = [
-            [
-                'username' => 'user1',
-                'password' => Hash::make('password1')
-            ],
-            [
-                'username' => 'user2',
-                'password' => Hash::make('password2')
-            ],
-        ];
-        foreach ($listFakeUser as $user) {
-            User::factory()->create($user);
-        };
+        $this->seed(UserSeeder::class);
     }
 
     public function test_missing_user_name()

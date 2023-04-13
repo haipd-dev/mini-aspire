@@ -16,17 +16,20 @@ return new class extends Migration
             $table->bigInteger('user_id');
             $table->double('amount', 12,2)->unsigned();
             $table->smallInteger('term')->unsigned();
-            $table->enum('status', [1,2,3])->comment('1: Pending, 2: Paid, 3: Pending');
+            $table->date('submit_date');
+            $table->enum('status', [1,2,3])->comment('1: Pending, 2: Paid, 3: Pending')->default(1);
             $table->timestamps();
+            $table->index('user_id', 'loans_user_id_index');
         });
 
         Schema::create('loan_repayments', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('loan_id');
+            $table->bigInteger('loan_id')->unsigned();
             $table->double('amount', 12,2)->unsigned();
             $table->date('pay_date',);
-            $table->enum('status', [1,2])->comment('1: Pending, 2: Paid');
-            $table->foreign('loan_id')->references('id')->on('loans');
+            $table->enum('status', [1,2])->comment('1: Pending, 2: Paid')->default(1);
+            $table->foreign('loan_id')->references('id')->on('loans')->cascadeOnDelete();
+            $table->index('loan_id', 'loan_repayments_loan_id_index');
             $table->timestamps();
         });
     }

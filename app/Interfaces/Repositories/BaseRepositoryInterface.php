@@ -1,14 +1,16 @@
 <?php
 
-namespace App\Models\Repositories;
+namespace App\Interfaces\Repositories;
 
 interface BaseRepositoryInterface
 {
-    public function getById($id);
+    public function getModel();
+    public function find($id);
 
-    public function update($id, $data);
+    public function create(array $data);
+    public function update($id, array $data);
 
     public function delete($id);
 
-    public function all();
+    public function getAll();
 }
