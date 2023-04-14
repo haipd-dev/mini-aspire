@@ -22,10 +22,10 @@ class AuthController extends BaseController
         /** @var $user User */
         $user = User::query()->where('username', $username)->first();
         if (! $user || ! Hash::check($password, $user->password)) {
-            return response('Invalide username or password', 401);
+            return response('Invalid username or password', 401);
         }
         $token = $user->createToken('Customer Token');
-        $expiresIn = config('sanctum.sanctum');
+        $expiresIn = config('sanctum.expiration');
 
         return response()->json(['access_token' => $token->plainTextToken, 'token_type' => 'Bearer', 'expires_in' => $expiresIn]);
     }
