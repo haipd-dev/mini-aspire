@@ -6,7 +6,6 @@ use App\Models\LoanRepayment;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-
 class LoanRepaymentPaid
 {
     use Dispatchable, SerializesModels;
@@ -21,7 +20,8 @@ class LoanRepaymentPaid
         $this->repayment = $loanRepayment;
     }
 
-    public function getLoanRepayment(){
+    public function getLoanRepayment()
+    {
         return $this->repayment;
     }
 }

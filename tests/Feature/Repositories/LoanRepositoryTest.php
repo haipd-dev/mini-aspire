@@ -25,7 +25,6 @@ class LoanRepositoryTest extends TestCase
         $this->repository = $this->app->make(LoanRepositoryInterface::class);
     }
 
-
     public function test_get_model()
     {
         $model = $this->repository->getModel();
@@ -37,7 +36,7 @@ class LoanRepositoryTest extends TestCase
      */
     public function test_find_loan(): void
     {
-        /** @var  $repository LoanRepositoryInterface */
+        /** @var $repository LoanRepositoryInterface */
         $user = $this->repository->find(1);
         $this->assertTrue($user instanceof Loan);
         $this->assertEquals(1, $user->id);
@@ -55,7 +54,7 @@ class LoanRepositoryTest extends TestCase
         $userId = 1;
         $amount = 3000;
         $term = 3;
-        $submitDate = "2023-04-13";
+        $submitDate = '2023-04-13';
         $status = Loan::STATUS_PENDING;
 
         $data = [
@@ -63,7 +62,7 @@ class LoanRepositoryTest extends TestCase
             'amount' => $amount,
             'term' => $term,
             'submit_date' => $submitDate,
-            'status' => $status
+            'status' => $status,
         ];
         $model = $this->repository->create($data);
         $this->assertTrue($model instanceof Loan);
@@ -91,7 +90,7 @@ class LoanRepositoryTest extends TestCase
             'status' => $status,
             'amount' => $amount,
             'term' => $term,
-            'submit_date' => $submitDate
+            'submit_date' => $submitDate,
         ];
         $model = $this->repository->update($id, $updateData);
         $this->assertEquals($status, $model->status);
@@ -111,7 +110,7 @@ class LoanRepositoryTest extends TestCase
             'status' => $status,
             'amount' => $amount,
             'term' => $term,
-            'submit_date' => $submitDate
+            'submit_date' => $submitDate,
         ];
         $this->expectException(NotFoundException::class);
         $this->repository->update($loanId, $updateData);

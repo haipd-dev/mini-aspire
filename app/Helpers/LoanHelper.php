@@ -9,13 +9,13 @@ class LoanHelper
     public function calculateRepayment(float $amount, int $term, $requestDate): array
     {
         $result = [];
-        if($amount <= 0 || $term <= 0){
-            throw new InvalidInputException("Amount and value must be larger than zero");
+        if ($amount <= 0 || $term <= 0) {
+            throw new InvalidInputException('Amount and value must be larger than zero');
         }
         $avgAmount = round($amount / $term, 2);
         $date = \DateTime::createFromFormat('Y-m-d', $requestDate);
-        if(!$date){
-            throw new InvalidInputException("Date format should be Y-m-d");
+        if (! $date) {
+            throw new InvalidInputException('Date format should be Y-m-d');
         }
         $dateInterval = \DateInterval::createFromDateString('7 day');
         $date = $date->add($dateInterval);
@@ -29,6 +29,7 @@ class LoanHelper
             $result[] = $item;
             $date = $date->add($dateInterval);
         }
+
         return $result;
     }
 }

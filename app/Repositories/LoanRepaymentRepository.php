@@ -7,7 +7,6 @@ use App\Models\LoanRepayment;
 
 class LoanRepaymentRepository extends BaseRepository implements LoanRepaymentRepositoryInterface
 {
-
     public function getModel()
     {
         return LoanRepayment::class;
@@ -19,6 +18,7 @@ class LoanRepaymentRepository extends BaseRepository implements LoanRepaymentRep
         if ($status) {
             $query->where('status', $status);
         }
+
         return $query->get();
     }
 }

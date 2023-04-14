@@ -2,7 +2,6 @@
 
 namespace Tests\Feature\Services;
 
-use App\Events\LoanRepaymentPaid;
 use App\Exceptions\InvalidInputException;
 use App\Exceptions\NotAllowException;
 use App\Exceptions\NotFoundException;
@@ -12,7 +11,6 @@ use App\Models\Loan;
 use App\Models\LoanRepayment;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Event;
 use Mockery\MockInterface;
 use Tests\TestCase;
 
@@ -34,11 +32,11 @@ class LoanServiceTest extends TestCase
     public function test_invalid_input()
     {
         $this->expectException(InvalidInputException::class);
-        $this->loanService->createLoan(1, 0, 200, "2022-12-12");
+        $this->loanService->createLoan(1, 0, 200, '2022-12-12');
         $this->expectException(InvalidInputException::class);
-        $this->loanService->createLoan(1, 5000, 0, "2022-12-12");
+        $this->loanService->createLoan(1, 5000, 0, '2022-12-12');
         $this->expectException(InvalidInputException::class);
-        $this->loanService->createLoan(1, 5000, 2, "Some randow string");
+        $this->loanService->createLoan(1, 5000, 2, 'Some randow string');
     }
 
     public function test_created_no_remainder_loan_successfully()
@@ -69,7 +67,7 @@ class LoanServiceTest extends TestCase
         $userId = 1;
         $amount = 1000;
         $term = 3;
-        $startDate = "2023-04-14";
+        $startDate = '2023-04-14';
         $loan = $this->loanService->createLoan($userId, $amount, $term, $startDate);
         $this->assertTrue($loan instanceof Loan);
         $loanRepayments = $loan->repayments;
@@ -91,13 +89,13 @@ class LoanServiceTest extends TestCase
     public function test_generating_repayment_fail()
     {
         $mockLoanRepaymentRepository = $this->mock(LoanRepaymentRepositoryInterface::class, function (MockInterface $mock) {
-            $mock->shouldReceive('create')->andThrow(new \Exception("Some exception because of any reason"));
+            $mock->shouldReceive('create')->andThrow(new \Exception('Some exception because of any reason'));
         });
-        /** @var  $service LoanServiceInterface */
-        $service = $this->app->make(LoanServiceInterface::class, ["loanRepaymentRepository" => $mockLoanRepaymentRepository]);
-        $user = User::factory()->create(['username' => "random_user_name"]);
+        /** @var $service LoanServiceInterface */
+        $service = $this->app->make(LoanServiceInterface::class, ['loanRepaymentRepository' => $mockLoanRepaymentRepository]);
+        $user = User::factory()->create(['username' => 'random_user_name']);
         $this->expectException(\Exception::class);
-        $service->createLoan($user->id, 500, 5, "2022-06-15");
+        $service->createLoan($user->id, 500, 5, '2022-06-15');
         $this->assertDatabaseMissing('loans', ['user_id' => $user->id]);
     }
 
@@ -140,7 +138,7 @@ class LoanServiceTest extends TestCase
     {
         $user = User::factory()->create();
         $loan = Loan::factory()->create(['user_id' => $user->id, 'term' => 1, 'status' => Loan::STATUS_PAID]);
-        $loanRepayment = LoanRepayment::factory()->create(['loan_id' => $loan->id, "amount" => $loan->amount, "status" => LoanRepayment::STATUS_PAID]);
+        $loanRepayment = LoanRepayment::factory()->create(['loan_id' => $loan->id, 'amount' => $loan->amount, 'status' => LoanRepayment::STATUS_PAID]);
         $this->expectException(NotAllowException::class);
         $this->loanService->payRepayment($loanRepayment->id, $loanRepayment->amount);
     }
@@ -149,7 +147,7 @@ class LoanServiceTest extends TestCase
     {
         $user = User::factory()->create();
         $loan = Loan::factory()->create(['user_id' => $user->id, 'term' => 1, 'amount' => 1000, 'status' => Loan::STATUS_APPROVE]);
-        $loanRepayment = LoanRepayment::factory()->create(['loan_id' => $loan->id, "amount" => $loan->amount, "status" => LoanRepayment::STATUS_PENDING]);
+        $loanRepayment = LoanRepayment::factory()->create(['loan_id' => $loan->id, 'amount' => $loan->amount, 'status' => LoanRepayment::STATUS_PENDING]);
         $this->expectException(NotAllowException::class);
         $this->loanService->payRepayment($loanRepayment->id, 500);
     }
@@ -158,7 +156,7 @@ class LoanServiceTest extends TestCase
     {
         $user = User::factory()->create();
         $loan = Loan::factory()->create(['user_id' => $user->id, 'term' => 1, 'status' => Loan::STATUS_PENDING]);
-        $loanRepayment = LoanRepayment::factory()->create(['loan_id' => $loan->id, "amount" => $loan->amount, "status" => LoanRepayment::STATUS_PENDING]);
+        $loanRepayment = LoanRepayment::factory()->create(['loan_id' => $loan->id, 'amount' => $loan->amount, 'status' => LoanRepayment::STATUS_PENDING]);
         $this->expectException(NotAllowException::class);
         $this->loanService->payRepayment($loanRepayment->id, $loanRepayment->amount);
     }
@@ -166,8 +164,8 @@ class LoanServiceTest extends TestCase
     public function test_pay_repayment_some_repayments_successfully()
     {
         $user = User::factory()->create();
-        $loan = Loan::factory()->create(['user_id' => $user->id, 'term' => 2, "amount" => 1000, 'status' => Loan::STATUS_APPROVE]);
-        $loanRepayments = LoanRepayment::factory(2)->create(['loan_id' => $loan->id, "amount" => 500, "status" => LoanRepayment::STATUS_PENDING]);
+        $loan = Loan::factory()->create(['user_id' => $user->id, 'term' => 2, 'amount' => 1000, 'status' => Loan::STATUS_APPROVE]);
+        $loanRepayments = LoanRepayment::factory(2)->create(['loan_id' => $loan->id, 'amount' => 500, 'status' => LoanRepayment::STATUS_PENDING]);
         $loanRepayment = $loanRepayments[0];
         $newRepayment = $this->loanService->payRepayment($loanRepayment->id, $loanRepayment->amount);
         $this->assertEquals(LoanRepayment::STATUS_PAID, $newRepayment->status);
@@ -178,8 +176,8 @@ class LoanServiceTest extends TestCase
     public function test_pay_the_last_repayment_successfully()
     {
         $user = User::factory()->create();
-        $loan = Loan::factory()->create(['user_id' => $user->id, 'term' => 3, "amount" => 3000, 'status' => Loan::STATUS_APPROVE]);
-        $loanRepayments = LoanRepayment::factory(3)->create(['loan_id' => $loan->id, "amount" => 1000, "status" => LoanRepayment::STATUS_PENDING]);
+        $loan = Loan::factory()->create(['user_id' => $user->id, 'term' => 3, 'amount' => 3000, 'status' => Loan::STATUS_APPROVE]);
+        $loanRepayments = LoanRepayment::factory(3)->create(['loan_id' => $loan->id, 'amount' => 1000, 'status' => LoanRepayment::STATUS_PENDING]);
         $firstRepayment = $loanRepayments[0];
         $newRepayment = $this->loanService->payRepayment($firstRepayment->id, $firstRepayment->amount);
         $this->assertEquals(LoanRepayment::STATUS_PAID, $newRepayment->status);

@@ -2,7 +2,8 @@
 
 namespace App\Exceptions;
 
-class NotFoundException extends \Exception
-{
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
+class NotFoundException extends NotFoundHttpException
+{
 }

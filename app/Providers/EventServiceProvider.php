@@ -21,8 +21,8 @@ class EventServiceProvider extends ServiceProvider
             SendEmailVerificationNotification::class,
         ],
         LoanRepaymentPaid::class => [
-            UpdateLoanStatus::class
-        ]
+            UpdateLoanStatus::class,
+        ],
     ];
 
     /**

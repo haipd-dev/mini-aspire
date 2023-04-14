@@ -20,7 +20,7 @@ class LoanRepaymentFactory extends Factory
         return [
             'amount' => fake()->randomFloat(),
             'pay_date' => fake()->date(),
-            'status' => fake()->randomElement([LoanRepayment::STATUS_PENDING, LoanRepayment::STATUS_PAID])
+            'status' => fake()->randomElement([LoanRepayment::STATUS_PENDING, LoanRepayment::STATUS_PAID]),
         ];
     }
 }

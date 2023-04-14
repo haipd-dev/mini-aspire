@@ -22,6 +22,7 @@ abstract class BaseRepository implements BaseRepositoryInterface
 
     /**
      * get model
+     *
      * @return string
      */
     abstract public function getModel();
@@ -38,6 +39,7 @@ abstract class BaseRepository implements BaseRepositoryInterface
 
     /**
      * Get All
+     *
      * @return \Illuminate\Database\Eloquent\Collection|static[]
      */
     public function getAll()
@@ -47,21 +49,22 @@ abstract class BaseRepository implements BaseRepositoryInterface
 
     /**
      * Get one
-     * @param $id
+     *
      * @return mixed
      */
     public function find($id)
     {
         $result = $this->_model->find($id);
-        if(!$result){
+        if (! $result) {
             throw new NotFoundException("Entity id $id not found");
         }
+
         return $result;
     }
 
     /**
      * Create
-     * @param array $attributes
+     *
      * @return mixed
      */
     public function create(array $attributes)
@@ -71,8 +74,7 @@ abstract class BaseRepository implements BaseRepositoryInterface
 
     /**
      * Update
-     * @param $id
-     * @param array $attributes
+     *
      * @return bool|mixed
      */
     public function update($id, array $attributes)
@@ -80,6 +82,7 @@ abstract class BaseRepository implements BaseRepositoryInterface
         $result = $this->find($id);
         if ($result) {
             $result->update($attributes);
+
             return $result;
         }
 
@@ -89,7 +92,6 @@ abstract class BaseRepository implements BaseRepositoryInterface
     /**
      * Delete
      *
-     * @param $id
      * @return bool
      */
     public function delete($id)
@@ -97,6 +99,7 @@ abstract class BaseRepository implements BaseRepositoryInterface
         $result = $this->_model->find($id);
         if ($result) {
             $result->delete();
+
             return true;
         }
 

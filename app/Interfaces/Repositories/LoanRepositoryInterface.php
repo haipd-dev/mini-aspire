@@ -2,9 +2,7 @@
 
 namespace App\Interfaces\Repositories;
 
-use App\Interfaces\Repositories\BaseRepositoryInterface;
-
 interface LoanRepositoryInterface extends BaseRepositoryInterface
 {
-
+    public function getByUserId($userId, $skip = 0, $limit = 10);
 }
