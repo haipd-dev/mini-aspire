@@ -25,7 +25,7 @@ class LoanRepositoryTest extends TestCase
         $this->repository = $this->app->make(LoanRepositoryInterface::class);
     }
 
-    public function test_get_model()
+    public function test_check_the_right_model()
     {
         $model = $this->repository->getModel();
         $this->assertEquals(Loan::class, $model);
@@ -34,7 +34,7 @@ class LoanRepositoryTest extends TestCase
     /**
      * A basic feature test example.
      */
-    public function test_find_loan(): void
+    public function test_find_the_right_loan(): void
     {
         /** @var $repository LoanRepositoryInterface */
         $user = $this->repository->find(1);
@@ -42,7 +42,7 @@ class LoanRepositoryTest extends TestCase
         $this->assertEquals(1, $user->id);
     }
 
-    public function test_not_found_loan()
+    public function test_throw_exception_when_not_found_loan()
     {
         $this->expectException(NotFoundException::class);
         $this->repository->find(3);
@@ -73,7 +73,7 @@ class LoanRepositoryTest extends TestCase
         $this->assertEquals($status, $model->status);
     }
 
-    public function test_get_all()
+    public function test_get_all_loans()
     {
         $allRecords = count($this->repository->getAll());
         $this->assertDatabaseCount('loans', $allRecords);
@@ -99,7 +99,7 @@ class LoanRepositoryTest extends TestCase
         $this->assertEquals($submitDate, $model->submit_date);
     }
 
-    public function test_update_not_existed_record()
+    public function test_throw_exception_when_update_not_existed_record()
     {
         $loanId = 1200;
         $status = Loan::STATUS_PAID;

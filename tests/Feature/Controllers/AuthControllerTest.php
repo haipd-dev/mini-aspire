@@ -4,6 +4,7 @@ namespace Tests\Feature\Controllers;
 
 use Database\Seeders\UserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\Response;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\TestCase;
 
@@ -17,15 +18,15 @@ class AuthControllerTest extends TestCase
         $this->seed(UserSeeder::class);
     }
 
-    public function test_missing_user_name()
+    public function test_validate_when_missing_user_name()
     {
         $response = $this->postJson('api/auth/get-token', [
             'password' => 'testpassword',
         ]);
-        $response->assertStatus(422);
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
     }
 
-    public function test_missing_password()
+    public function test_validate_when_missing_password()
     {
         $response = $this->postJson('api/auth/get-token', [
             'username' => 'testusername',
@@ -33,13 +34,13 @@ class AuthControllerTest extends TestCase
         $response->assertStatus(422);
     }
 
-    public function test_wrong_username_or_password()
+    public function test_unauthorized_with_wrong_username_or_password()
     {
         $response = $this->postJson('api/auth/get-token', [
             'username' => 'user1',
             'password' => 'nopassword',
         ]);
-        $response->assertStatus(401);
+        $response->assertStatus(Response::HTTP_UNAUTHORIZED);
 
         $response = $this->postJson('api/auth/get-token', [
             'username' => 'user1',
@@ -54,7 +55,7 @@ class AuthControllerTest extends TestCase
         $response->assertStatus(401);
     }
 
-    public function test_valid_user_name_and_password()
+    public function test_return_token_with_valid_user_name_and_password()
     {
         $response = $this->postJson('api/auth/get-token', [
             'username' => 'user1',

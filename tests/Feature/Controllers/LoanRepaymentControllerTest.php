@@ -1,10 +1,10 @@
 <?php
 
 namespace Tests\Feature\Controllers;
+
 use App\Interfaces\Services\LoanServiceInterface;
 use App\Models\Loan;
 use App\Models\LoanRepayment;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Response;
 use Tests\Feature\AbstractFeatureTest;
 
@@ -14,13 +14,15 @@ class LoanRepaymentControllerTest extends AbstractFeatureTest
      * @var LoanServiceInterface
      */
     protected $loanService;
+
     protected function setUp(): void
     {
         parent::setUp();
         $this->loanService = $this->app->make(LoanServiceInterface::class);
     }
 
-    public function test_unauthorized_when_pay_with_unauthorized_token(){
+    public function test_unauthorized_when_pay_with_unauthorized_token()
+    {
         $randomId = 2;
         $response = $this->postJson("api/loan-repayment/$randomId/pay", []);
         $response->assertStatus(Response::HTTP_UNAUTHORIZED);
@@ -28,7 +30,8 @@ class LoanRepaymentControllerTest extends AbstractFeatureTest
         $response->assertStatus(Response::HTTP_UNAUTHORIZED);
     }
 
-    public function test_validate_amount_format_on_pay(){
+    public function test_validate_amount_format_on_pay()
+    {
         $customerUser = $this->createCustomerUser();
         $token = $customerUser->createToken("User Token");
         $loan = $this->generateLoan($customerUser->id);
@@ -36,12 +39,13 @@ class LoanRepaymentControllerTest extends AbstractFeatureTest
         $response = $this->withToken($token->plainTextToken)->postJson("api/loan-repayment/{$repayment->id}/pay", []);
         $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
         $response->assertInvalid(['amount']);
-        $response = $this->withToken($token->plainTextToken)->postJson("api/loan-repayment/{$repayment->id}/pay", [ 'amount' => "Some random amount"]);
+        $response = $this->withToken($token->plainTextToken)->postJson("api/loan-repayment/{$repayment->id}/pay", ['amount' => "Some random amount"]);
         $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
         $response->assertInvalid(['amount']);
     }
 
-    public function test_reject_pay_repayment_of_other_user(){
+    public function test_reject_pay_repayment_of_other_user()
+    {
         $customerUser = $this->createCustomerUser();
         $loan = $this->generateLoan($customerUser->id);
         $this->loanService->approveLoan($loan->id);
@@ -53,7 +57,8 @@ class LoanRepaymentControllerTest extends AbstractFeatureTest
 
     }
 
-    public function test_prevent_pay_because_of_loan_status(){
+    public function test_prevent_pay_because_of_loan_status()
+    {
         $customerUser = $this->createCustomerUser();
         $loan = $this->generateLoan($customerUser->id);
         $token = $customerUser->createToken("User token");
@@ -62,7 +67,8 @@ class LoanRepaymentControllerTest extends AbstractFeatureTest
         $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
     }
 
-    public function test_prevent_pay_with_smaller_amount(){
+    public function test_prevent_pay_with_smaller_amount()
+    {
         $customerUser = $this->createCustomerUser();
         $loan = $this->generateLoan($customerUser->id);
         $this->loanService->approveLoan($loan->id);
@@ -72,7 +78,8 @@ class LoanRepaymentControllerTest extends AbstractFeatureTest
         $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
     }
 
-    public function test_pay_with_greater_amount(){
+    public function test_pay_with_greater_amount()
+    {
         $customerUser = $this->createCustomerUser();
         $loan = $this->generateLoan($customerUser->id);
         $this->loanService->approveLoan($loan->id);
@@ -83,11 +90,14 @@ class LoanRepaymentControllerTest extends AbstractFeatureTest
         $response->assertStatus(Response::HTTP_OK);
         $response->assertJsonPath('id', $repayment->id);
         $response->assertJsonPath('status', LoanRepayment::STATUS_PAID);
-        $response->assertJsonPath('paid_amount', function ($result) use ($amount) {return (double) $result == (double) $amount ;});
+        $response->assertJsonPath('paid_amount', function ($result) use ($amount) {
+            return (double)$result == (double)$amount;
+        });
         $this->assertDatabaseHas('loans', ['id' => $loan->id, 'status' => Loan::STATUS_PARTIAL_PAID]);
     }
 
-    public function test_pay_successfully_and_change_loan_to_partial_paid(){
+    public function test_pay_successfully_and_change_loan_to_partial_paid()
+    {
         $customerUser = $this->createCustomerUser();
         $loan = $this->generateLoan($customerUser->id);
         $this->loanService->approveLoan($loan->id);
@@ -97,24 +107,50 @@ class LoanRepaymentControllerTest extends AbstractFeatureTest
         $response->assertStatus(Response::HTTP_OK);
         $response->assertJsonPath('id', $repayment->id);
         $response->assertJsonPath('status', LoanRepayment::STATUS_PAID);
-        $response->assertJsonPath('paid_amount', function ($amount) use ($repayment) {return (double) $amount == (double) $repayment->amount ;});
+        $response->assertJsonPath('paid_amount', function ($amount) use ($repayment) {
+            return (double)$amount == (double)$repayment->amount;
+        });
         $this->assertDatabaseHas('loans', ['id' => $loan->id, 'status' => Loan::STATUS_PARTIAL_PAID]);
     }
 
-    public function test_pay_all_repayments_successfully_and_change_loan_to_paid(){
+    public function test_pay_all_repayments_successfully_and_change_loan_to_paid()
+    {
         $customerUser = $this->createCustomerUser();
         $loan = $this->generateLoan($customerUser->id);
         $this->loanService->approveLoan($loan->id);
         $token = $customerUser->createToken("User token");
         $repayments = $loan->repayments;
-        foreach ($repayments as $repayment){
+        foreach ($repayments as $repayment) {
             $response = $this->withToken($token->plainTextToken)->postJson("api/loan-repayment/{$repayment->id}/pay", ['amount' => $repayment->amount]);
             $response->assertStatus(Response::HTTP_OK);
             $response->assertJsonPath('id', $repayment->id);
-            $response->assertJsonPath('paid_amount', function ($amount) use ($repayment) {return (double) $amount == (double) $repayment->amount ;});
+            $response->assertJsonPath('paid_amount', function ($amount) use ($repayment) {
+                return (double)$amount == (double)$repayment->amount;
+            });
             $response->assertJsonPath('status', LoanRepayment::STATUS_PAID);
         }
         $this->assertDatabaseHas('loans', ['id' => $loan->id, 'status' => Loan::STATUS_PAID]);
+    }
+
+    public function test_full_early_repayment_with_less_than_term_time()
+    {
+        $customerUser = $this->createCustomerUser();
+        $loan = $this->generateLoan($customerUser->id);
+        $this->loanService->approveLoan($loan->id);
+        $token = $customerUser->createToken("User token");
+        [$repayment] = $loan->repayments;
+        $response = $this->withToken($token->plainTextToken)->postJson("api/loan-repayment/{$repayment->id}/pay", ['amount' => $loan->amount]);
+        $response->assertStatus(Response::HTTP_OK);
+        $response->assertJsonPath('id', $repayment->id);
+        $response->assertJsonPath('paid_amount', function ($amount) use ($loan) {
+            return (double)$amount == (double)$loan->amount;
+        });
+        $response->assertJsonPath('status', LoanRepayment::STATUS_PAID);
+        $this->assertDatabaseHas('loans', ['id' => $loan->id, 'status' => Loan::STATUS_PAID]);
+        $this->assertDatabaseHas('loan_repayments', ['loan_id' => $loan->id, 'status' => LoanRepayment::STATUS_PAID]);
+        $this->assertDatabaseHas('loan_repayments', ['loan_id' => $loan->id, 'status' => LoanRepayment::STATUS_AUTO_PAID]);
+
+
     }
 
 }

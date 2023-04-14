@@ -18,7 +18,7 @@ class LoanControllerTest extends TestCase
         $request->assertStatus(Response::HTTP_UNAUTHORIZED);
     }
 
-    public function test_duplicate_request_create_loan()
+    public function test_prevent_duplicate_request_create_loan()
     {
 
     }
@@ -26,7 +26,7 @@ class LoanControllerTest extends TestCase
     public function test_validate_carefully(){
 
     }
-    public function test_create_loan_with_invalid_input()
+    public function test_validate_when_create_loan_with_invalid_input()
     {
         /** @var $user User */
         $user = User::factory()->create();
@@ -59,7 +59,7 @@ class LoanControllerTest extends TestCase
         }
     }
 
-    public function test_create_loan_successfully()
+    public function test_create_loan()
     {
         $user = User::factory()->create();
         $token = $user->createToken('Customer Token');
@@ -87,7 +87,7 @@ class LoanControllerTest extends TestCase
         $this->assertEquals(10000, $totalAmount);
     }
 
-    public function test_get_not_existed_loan()
+    public function test_return_not_found_when_get_not_existed_loan()
     {
         $user = User::factory()->create();
         $token = $user->createToken('Customer Token');
@@ -97,7 +97,7 @@ class LoanControllerTest extends TestCase
         $response->assertStatus(Response::HTTP_NOT_FOUND);
     }
 
-    public function test_get_loan_of_other_user()
+    public function test_forbidden_when_get_loan_of_other_user()
     {
         $createdUser = User::factory()->create();
         $createdLoan = Loan::factory()->create(['user_id' => $createdUser->id]);
@@ -119,7 +119,7 @@ class LoanControllerTest extends TestCase
         $response->assertJsonPath('id', $createdLoan->id);
     }
 
-    public function test_approve_loan_with_invalid_token()
+    public function test_unauthorized_when_approve_loan_with_invalid_token()
     {
         $user = User::factory()->create();
         $createdLoan = Loan::factory()->create(['user_id' => $user->id]);
@@ -129,7 +129,7 @@ class LoanControllerTest extends TestCase
         $response->assertStatus(Response::HTTP_UNAUTHORIZED);
     }
 
-    public function test_approve_loan_with_not_admin_user()
+    public function test_forbidden_when_approve_loan_with_not_admin_user()
     {
         $user = User::factory()->create(['user_type' => User::TYPE_CUSTOMER]);
         $createdLoan = Loan::factory()->create(['user_id' => $user->id]);
@@ -138,7 +138,7 @@ class LoanControllerTest extends TestCase
         $response->assertStatus(Response::HTTP_FORBIDDEN);
     }
 
-    public function test_approve_not_existed_loan()
+    public function test_not_found_when_approve_not_existed_loan()
     {
         $adminUser = User::factory()->create(['user_type' => User::TYPE_ADMIN]);
         $token = $adminUser->createToken('User Token');
@@ -147,12 +147,12 @@ class LoanControllerTest extends TestCase
         $response->assertStatus(Response::HTTP_NOT_FOUND);
     }
 
-    public function test_approve_with_duplicate_request_id()
+    public function test_prevent_approve_with_duplicate_request_id()
     {
 
     }
 
-    public function test_approve_approved_reject_and_paid_loan()
+    public function test_unprocessable_entity_when_approve_approved_reject_and_paid_loan()
     {
         $adminUser = User::factory()->create(['user_type' => User::TYPE_ADMIN]);
         $token = $adminUser->createToken('User Token');
@@ -176,5 +176,14 @@ class LoanControllerTest extends TestCase
         $response->assertStatus(Response::HTTP_OK);
         $response->assertJsonPath('id', $pendingLoan->id);
         $response->assertJsonPath('status', Loan::STATUS_APPROVE);
+    }
+
+
+    public function test_unauthorized_for_non_or_invalid_token_to_get_loan_list(){
+
+    }
+
+    public function test_customer_get_list_loan(){
+
     }
 }

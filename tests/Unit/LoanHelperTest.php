@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 
 class LoanHelperTest extends TestCase
 {
-    public function test_invalid_input()
+    public function test_throw_exception_on_invalid_input()
     {
         $loanHelper = new LoanHelper();
         $date = '2023-04-14';
@@ -22,7 +22,7 @@ class LoanHelperTest extends TestCase
         $loanHelper->calculateRepayment(500, 2, 'Some random string');
     }
 
-    public function test_no_remainder_amount(): void
+    public function test_generate_amount_which_no_remainder_amount(): void
     {
         $amount = 3000;
         $term = 3;
@@ -32,7 +32,7 @@ class LoanHelperTest extends TestCase
         $this->test_data($amount, $term, $date, $expectRepaymentAmount, $expectedDates);
     }
 
-    public function test_has_remainder_amount(): void
+    public function test_generate_amount_which_remainder_amount(): void
     {
         $amount = 4000;
         $term = 3;

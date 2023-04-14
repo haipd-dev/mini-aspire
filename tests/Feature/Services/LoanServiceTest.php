@@ -12,9 +12,9 @@ use App\Models\LoanRepayment;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Mockery\MockInterface;
-use Tests\TestCase;
+use Tests\Feature\AbstractFeatureTest;
 
-class LoanServiceTest extends TestCase
+class LoanServiceTest extends AbstractFeatureTest
 {
     use RefreshDatabase;
 
@@ -29,7 +29,7 @@ class LoanServiceTest extends TestCase
         $this->loanService = $this->app->make(LoanServiceInterface::class);
     }
 
-    public function test_invalid_input()
+    public function test_throw_exception_with_invalid_input()
     {
         $this->expectException(InvalidInputException::class);
         $this->loanService->createLoan(1, 0, 200, '2022-12-12');
@@ -39,7 +39,7 @@ class LoanServiceTest extends TestCase
         $this->loanService->createLoan(1, 5000, 2, 'Some randow string');
     }
 
-    public function test_created_no_remainder_loan_successfully()
+    public function test_create_no_remainder_amount_loan()
     {
         $userId = 1;
         $amount = 1000;
@@ -62,7 +62,7 @@ class LoanServiceTest extends TestCase
         $this->assertEquals($amount, $totalAmount);
     }
 
-    public function test_created_remainder_loan_successfully()
+    public function test_create_remainder_amount_loan()
     {
         $userId = 1;
         $amount = 1000;
@@ -86,7 +86,7 @@ class LoanServiceTest extends TestCase
         $this->assertEquals($amount, $totalAmount);
     }
 
-    public function test_generating_repayment_fail()
+    public function test_revert_data_when_there_is_exception_saving_repayment()
     {
         $mockLoanRepaymentRepository = $this->mock(LoanRepaymentRepositoryInterface::class, function (MockInterface $mock) {
             $mock->shouldReceive('create')->andThrow(new \Exception('Some exception because of any reason'));
@@ -99,14 +99,14 @@ class LoanServiceTest extends TestCase
         $this->assertDatabaseMissing('loans', ['user_id' => $user->id]);
     }
 
-    public function test_approve_not_existed_loan()
+    public function test_throw_exception_when_approve_not_existed_loan()
     {
         $notExistedId = 5000;
         $this->expectException(NotFoundException::class);
         $this->loanService->approveLoan($notExistedId);
     }
 
-    public function test_approve_non_pending_loan()
+    public function test_throw_exception_when_approve_non_pending_loan()
     {
         $user = User::factory()->create();
         $paidLoan = Loan::factory()->create(['user_id' => $user->id, 'status' => Loan::STATUS_PAID]);
@@ -127,14 +127,14 @@ class LoanServiceTest extends TestCase
         $this->assertDatabaseHas('loans', ['id' => $pendingLoan->id, 'status' => Loan::STATUS_APPROVE]);
     }
 
-    public function test_pay_un_exist_repayment()
+    public function test_throw_exception_when_pay_un_exist_repayment()
     {
         $notExistedId = 5000;
         $this->expectException(NotFoundException::class);
         $this->loanService->payRepayment($notExistedId, 3000);
     }
 
-    public function test_pay_paid_repayment()
+    public function test_throw_exception_when_pay_paid_repayment()
     {
         $user = User::factory()->create();
         $loan = Loan::factory()->create(['user_id' => $user->id, 'term' => 1, 'status' => Loan::STATUS_PAID]);
@@ -143,7 +143,7 @@ class LoanServiceTest extends TestCase
         $this->loanService->payRepayment($loanRepayment->id, $loanRepayment->amount);
     }
 
-    public function test_pay_repayment_with_smaller_amount()
+    public function test_throw_exception_when_pay_repayment_with_smaller_amount()
     {
         $user = User::factory()->create();
         $loan = Loan::factory()->create(['user_id' => $user->id, 'term' => 1, 'amount' => 1000, 'status' => Loan::STATUS_APPROVE]);
@@ -152,7 +152,7 @@ class LoanServiceTest extends TestCase
         $this->loanService->payRepayment($loanRepayment->id, 500);
     }
 
-    public function test_pay_repayment_with_not_allowed_loan()
+    public function test_throw_exception_when_pay_repayment_of_pending_or_reject_loan()
     {
         $user = User::factory()->create();
         $loan = Loan::factory()->create(['user_id' => $user->id, 'term' => 1, 'status' => Loan::STATUS_PENDING]);
@@ -192,5 +192,18 @@ class LoanServiceTest extends TestCase
             }
         }
         $this->assertDatabaseHas('loans', ['id' => $loan->id, 'status' => Loan::STATUS_PAID]);
+    }
+
+    public function test_full_early_repayment_with_less_than_term_time()
+    {
+        $customer = $this->createCustomerUser();
+        $loan = $this->generateLoan($customer->id);
+        [$repayment] = $loan->repayments;
+        $this->loanService->approveLoan($loan->id);
+        $this->loanService->payRepayment($repayment->id, $loan->amount);
+        $this->assertDatabaseHas('loans', ['id' => $loan->id, 'status' => Loan::STATUS_PAID]);
+        $this->assertDatabaseHas('loan_repayments', ['loan_id' => $loan->id, 'status' => LoanRepayment::STATUS_PAID]);
+        $this->assertDatabaseHas('loan_repayments', ['loan_id' => $loan->id, 'status' => LoanRepayment::STATUS_AUTO_PAID]);
+
     }
 }

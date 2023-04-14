@@ -26,13 +26,13 @@ class LoanPaymentRepositoryTest extends TestCase
         $this->repository = $this->app->make(LoanRepaymentRepositoryInterface::class);
     }
 
-    public function test_get_model()
+    public function test_check_the_right_model()
     {
         $model = $this->repository->getModel();
         $this->assertEquals(LoanRepayment::class, $model);
     }
 
-    public function test_find_loan_repayment(): void
+    public function test_find_the_right_loan_repayment(): void
     {
         /** @var $repository LoanRepositoryInterface */
         $record = $this->repository->find(1);
@@ -41,7 +41,7 @@ class LoanPaymentRepositoryTest extends TestCase
     }
 
 //
-    public function test_not_found_loan_repayment()
+    public function test_throw_exception_when_not_found_loan_repayment()
     {
         $this->expectException(NotFoundException::class);
         $this->repository->find(200);
@@ -68,7 +68,7 @@ class LoanPaymentRepositoryTest extends TestCase
         $this->assertEquals($status, $model->status);
     }
 
-    public function test_get_all()
+    public function test_get_all_repayments()
     {
         $allRecords = count($this->repository->getAll());
         $this->assertDatabaseCount('loan_repayments', $allRecords);
@@ -91,7 +91,7 @@ class LoanPaymentRepositoryTest extends TestCase
         $this->assertEquals($payDate, $model->pay_date);
     }
 
-    public function test_update_not_existed_record()
+    public function test_throw_exception_when_update_not_existed_record()
     {
         $loanRepaymentId = 1200;
         $status = LoanRepayment::STATUS_PAID;

@@ -21,4 +21,13 @@ class LoanRepaymentRepository extends BaseRepository implements LoanRepaymentRep
 
         return $query->get();
     }
+
+    public function massUpdate($filter, $updateData)
+    {
+        $query = $this->_model->newQuery();
+        foreach ($filter as $key => $value) {
+            $query = $query->where($key, $value);
+        }
+        $query->update($updateData);
+    }
 }
