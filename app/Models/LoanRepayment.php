@@ -23,6 +23,10 @@ class LoanRepayment extends Model
         'paid_amount',
         'currency',
     ];
+    protected $casts = [
+        'amount' => "double",
+        "paid_amount" => "double"
+    ];
 
     protected $hidden = [
         'created_at',

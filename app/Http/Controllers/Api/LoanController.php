@@ -36,7 +36,6 @@ class LoanController extends BaseController
     {
         $id = $request->route('id');
         $listRepayments = $loanRepaymentRepository->getByLoanId($id);
-
         return response()->json($listRepayments);
     }
 
@@ -62,16 +61,9 @@ class LoanController extends BaseController
     public function approveLoan(Request $request, LoanServiceInterface $loanService)
     {
         $id = $request->route('id');
-        $this->authorize('approve');
+        $this->authorize('approve', Loan::class);
 
         return response()->json($loanService->approveLoan($id));
-    }
-
-    public function payLoanRepayment(Request $request, LoanServiceInterface $loanService)
-    {
-        $repaymentId = $request->get('id');
-        $amount = $request->get('amount');
-        $loanService->payRepayment($repaymentId, $amount);
     }
 
     public function getAllLoans(Request $request, LoanRepositoryInterface $loanRepository)

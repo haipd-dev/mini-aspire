@@ -23,6 +23,9 @@ class LoanControllerTest extends TestCase
 
     }
 
+    public function test_validate_carefully(){
+
+    }
     public function test_create_loan_with_invalid_input()
     {
         /** @var $user User */
@@ -79,7 +82,7 @@ class LoanControllerTest extends TestCase
             });
         $repayments = $response->json('repayments');
         $totalAmount = array_reduce($repayments, function ($pre, $cur) {
-        return $pre + $cur['amount'];
+            return $pre + $cur['amount'];
         }, 0);
         $this->assertEquals(10000, $totalAmount);
     }
@@ -114,5 +117,64 @@ class LoanControllerTest extends TestCase
         $response = $client->getJson("api/loan/{$createdLoan->id}");
         $response->assertStatus(Response::HTTP_OK);
         $response->assertJsonPath('id', $createdLoan->id);
+    }
+
+    public function test_approve_loan_with_invalid_token()
+    {
+        $user = User::factory()->create();
+        $createdLoan = Loan::factory()->create(['user_id' => $user->id]);
+        $response = $this->postJson("api/loan/{$createdLoan->id}/approve");
+        $response->assertStatus(Response::HTTP_UNAUTHORIZED);
+        $response = $this->withToken('some_random_token')->postJson("api/loan/{$createdLoan->id}/approve");
+        $response->assertStatus(Response::HTTP_UNAUTHORIZED);
+    }
+
+    public function test_approve_loan_with_not_admin_user()
+    {
+        $user = User::factory()->create(['user_type' => User::TYPE_CUSTOMER]);
+        $createdLoan = Loan::factory()->create(['user_id' => $user->id]);
+        $token = $user->createToken('User Token');
+        $response = $this->withToken($token->plainTextToken)->postJson("api/loan/{$createdLoan->id}/approve");
+        $response->assertStatus(Response::HTTP_FORBIDDEN);
+    }
+
+    public function test_approve_not_existed_loan()
+    {
+        $adminUser = User::factory()->create(['user_type' => User::TYPE_ADMIN]);
+        $token = $adminUser->createToken('User Token');
+        $notExistedId = 500;
+        $response = $this->withToken($token->plainTextToken)->postJson("api/loan/$notExistedId/approve");
+        $response->assertStatus(Response::HTTP_NOT_FOUND);
+    }
+
+    public function test_approve_with_duplicate_request_id()
+    {
+
+    }
+
+    public function test_approve_approved_reject_and_paid_loan()
+    {
+        $adminUser = User::factory()->create(['user_type' => User::TYPE_ADMIN]);
+        $token = $adminUser->createToken('User Token');
+        $customerUser = User::factory()->create(['user_type' => User::TYPE_CUSTOMER]);
+        $approvedLoan = Loan::factory()->create(['user_id' => $customerUser->id, 'status' => Loan::STATUS_APPROVE]);
+        $paidLoan = Loan::factory()->create(['user_id' => $customerUser->id, 'status' => Loan::STATUS_PAID]);
+        $rejectedLoan = Loan::factory()->create(['user_id' => $customerUser->id, 'status' => Loan::STATUS_REJECTED]);
+        foreach ([$approvedLoan, $paidLoan, $rejectedLoan] as $loan) {
+            $response = $this->withToken($token->plainTextToken)->postJson("api/loan/$loan->id/approve");
+            $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+    }
+
+    public function test_approve_loan_successfully()
+    {
+        $adminUser = User::factory()->create(['user_type' => User::TYPE_ADMIN]);
+        $token = $adminUser->createToken('User Token');
+        $customerUser = User::factory()->create(['user_type' => User::TYPE_CUSTOMER]);
+        $pendingLoan = Loan::factory()->create(['user_id' => $customerUser->id, 'status' => Loan::STATUS_PENDING]);
+        $response = $this->withToken($token->plainTextToken)->postJson("api/loan/$pendingLoan->id/approve");
+        $response->assertStatus(Response::HTTP_OK);
+        $response->assertJsonPath('id', $pendingLoan->id);
+        $response->assertJsonPath('status', Loan::STATUS_APPROVE);
     }
 }

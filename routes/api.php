@@ -24,8 +24,8 @@ Route::prefix('auth')->group(function () {
 Route::prefix('loan')->middleware('auth:sanctum')->group(function () {
     Route::put('', [\App\Http\Controllers\Api\LoanController::class, 'store']);
     Route::get('{id}', [\App\Http\Controllers\Api\LoanController::class, 'index']);
-    Route::get('{id}/approve', [\App\Http\Controllers\Api\LoanController::class, 'index']);
+    Route::Post('{id}/approve', [\App\Http\Controllers\Api\LoanController::class, 'approveLoan']);
 });
 Route::prefix('loan-repayment')->middleware('auth:sanctum')->group(function () {
-    Route::post('{id}/pay', [\App\Http\Controllers\Api\LoanController::class, 'store']);
+    Route::post('{id}/pay', [\App\Http\Controllers\Api\LoanRepaymentController::class, 'pay']);
 });
