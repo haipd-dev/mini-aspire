@@ -21,3 +21,10 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::prefix('auth')->group(function (){
     Route::post('get-token', [\App\Http\Controllers\Api\AuthController::class, 'getToken']);
 });
+Route::prefix('loan')->middleware('auth:sanctum')->group(function () {
+    Route::put('', [\App\Http\Controllers\Api\LoanController::class, 'store']);
+    Route::get('{id}/repayments');
+});
+Route::prefix('loan-repayment')->middleware('auth:sanctum')->group(function () {
+    Route::post('{id}/pay', [\App\Http\Controllers\Api\LoanController::class, 'store']);
+});
