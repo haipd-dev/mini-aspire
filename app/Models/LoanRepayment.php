@@ -18,6 +18,8 @@ class LoanRepayment extends Model
         'amount',
         'pay_date',
         'status',
+        'paid_amount',
+        'currency'
     ];
     protected $hidden = [
         'created_at',

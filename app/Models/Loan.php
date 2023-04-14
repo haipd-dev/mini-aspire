@@ -11,6 +11,8 @@ class Loan extends Model
     const STATUS_PENDING = 1;
     const STATUS_PAID = 2;
     const STATUS_APPROVE = 3;
+    const STATUS_PARTIAL_PAID = 4;
+    const STATUS_REJECTED = 5;
 
     protected $table = 'loans';
 
@@ -19,6 +21,7 @@ class Loan extends Model
         'amount',
         'term',
         'submit_date',
+        'currency',
         'status'
     ];
 
