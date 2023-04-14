@@ -27,6 +27,9 @@ Route::prefix('loan')->middleware('auth:sanctum')->group(function () {
     Route::get('{id}', [\App\Http\Controllers\Api\LoanController::class, 'index']);
     Route::Post('{id}/approve', [\App\Http\Controllers\Api\LoanController::class, 'approveLoan']);
 });
+Route::prefix('admin/loan')->middleware('auth:sanctum')->group(function () {
+    Route::get('list', [\App\Http\Controllers\Api\LoanController::class, 'listAll']);
+});
 Route::prefix('loan-repayment')->middleware('auth:sanctum')->group(function () {
     Route::post('{id}/pay', [\App\Http\Controllers\Api\LoanRepaymentController::class, 'pay']);
 });

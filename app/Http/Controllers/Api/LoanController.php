@@ -54,6 +54,7 @@ class LoanController extends BaseController
                 'date' => 'nullable|date:Y-m-d',
             ]
         );
+        $this->authorize('create', Loan::class);
         $amount = $request->get('amount');
         $term = $request->get('term');
         $date = $request->get('date');

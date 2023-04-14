@@ -25,7 +25,7 @@ class LoanPolicy
      */
     public function view(User $user, Loan $loan): bool
     {
-        return $user->id == $loan->user_id;
+        return $user->user_type == User::TYPE_ADMIN || $user->id == $loan->user_id;
     }
 
     /**
@@ -33,7 +33,7 @@ class LoanPolicy
      */
     public function create(User $user): bool
     {
-        return true;
+        return  $user->user_type == User::TYPE_CUSTOMER;
     }
 
     /**

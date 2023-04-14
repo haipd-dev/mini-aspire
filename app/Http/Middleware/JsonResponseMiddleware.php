@@ -32,15 +32,6 @@ class JsonResponseMiddleware
     public function handle(Request $request, Closure $next)
     {
         $request->headers->set('Accept', 'application/json');
-        $response = $next($request);
-        if (!$response instanceof JsonResponse) {
-            $response = $this->responseFactory->json(
-                $response->content(),
-                $response->status(),
-                $response->headers->all()
-            );
-        }
-
-        return $response;
+        return $next($request);
     }
 }

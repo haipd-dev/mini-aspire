@@ -40,7 +40,6 @@ class LoanRepository extends BaseRepository implements LoanRepositoryInterface
             $query->where('key', $value);
         }
         $query->skip($skip)->limit($limit)
-            ->with(['repayments'])
             ->orderBy('created_at', 'desc');
         return $query->get();
     }
