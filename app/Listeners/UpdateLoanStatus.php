@@ -30,22 +30,13 @@ class UpdateLoanStatus
     {
         $repayment = $event->getLoanRepayment();
         $loanId = $repayment->loan_id;
-        $loan = $this->loanRepository->find($loanId);
-        $paidAmount = $this->loanRepository->getPaidAmount($loanId);
-        $isPaid = $paidAmount >= $loan->amount;
-        $status = Loan::STATUS_PARTIAL_PAID;
-        if ($isPaid) {
-            $this->changeAllPendingRepaymentsToAutoPaid($loanId);
-            $status = Loan::STATUS_PAID;
+        $repayments = $this->loanRepaymentRepository->getByLoanId($loanId);
+        $status = Loan::STATUS_PAID;
+        foreach ($repayments as $item) {
+            if ($item->status == LoanRepayment::STATUS_PENDING) {
+                $status = Loan::STATUS_PARTIAL_PAID;
+            }
         }
         $this->loanRepository->update($loanId, ['status' => $status]);
-    }
-
-    private function changeAllPendingRepaymentsToAutoPaid($loanId)
-    {
-        $this->loanRepaymentRepository->massUpdate(
-            ['loan_id' => $loanId, 'status' => LoanRepayment::STATUS_PENDING],
-            ['status' => LoanRepayment::STATUS_AUTO_PAID]
-        );
     }
 }

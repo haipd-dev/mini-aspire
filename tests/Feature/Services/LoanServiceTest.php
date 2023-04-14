@@ -193,17 +193,4 @@ class LoanServiceTest extends AbstractFeatureTest
         }
         $this->assertDatabaseHas('loans', ['id' => $loan->id, 'status' => Loan::STATUS_PAID]);
     }
-
-    public function test_full_early_repayment_with_less_than_term_time()
-    {
-        $customer = $this->createCustomerUser();
-        $loan = $this->generateLoan($customer->id);
-        [$repayment] = $loan->repayments;
-        $this->loanService->approveLoan($loan->id);
-        $this->loanService->payRepayment($repayment->id, $loan->amount);
-        $this->assertDatabaseHas('loans', ['id' => $loan->id, 'status' => Loan::STATUS_PAID]);
-        $this->assertDatabaseHas('loan_repayments', ['loan_id' => $loan->id, 'status' => LoanRepayment::STATUS_PAID]);
-        $this->assertDatabaseHas('loan_repayments', ['loan_id' => $loan->id, 'status' => LoanRepayment::STATUS_AUTO_PAID]);
-
-    }
 }

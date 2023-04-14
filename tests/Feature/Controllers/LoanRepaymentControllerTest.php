@@ -132,25 +132,4 @@ class LoanRepaymentControllerTest extends AbstractFeatureTest
         $this->assertDatabaseHas('loans', ['id' => $loan->id, 'status' => Loan::STATUS_PAID]);
     }
 
-    public function test_full_early_repayment_with_less_than_term_time()
-    {
-        $customerUser = $this->createCustomerUser();
-        $loan = $this->generateLoan($customerUser->id);
-        $this->loanService->approveLoan($loan->id);
-        $token = $customerUser->createToken("User token");
-        [$repayment] = $loan->repayments;
-        $response = $this->withToken($token->plainTextToken)->postJson("api/loan-repayment/{$repayment->id}/pay", ['amount' => $loan->amount]);
-        $response->assertStatus(Response::HTTP_OK);
-        $response->assertJsonPath('id', $repayment->id);
-        $response->assertJsonPath('paid_amount', function ($amount) use ($loan) {
-            return (double)$amount == (double)$loan->amount;
-        });
-        $response->assertJsonPath('status', LoanRepayment::STATUS_PAID);
-        $this->assertDatabaseHas('loans', ['id' => $loan->id, 'status' => Loan::STATUS_PAID]);
-        $this->assertDatabaseHas('loan_repayments', ['loan_id' => $loan->id, 'status' => LoanRepayment::STATUS_PAID]);
-        $this->assertDatabaseHas('loan_repayments', ['loan_id' => $loan->id, 'status' => LoanRepayment::STATUS_AUTO_PAID]);
-
-
-    }
-
 }

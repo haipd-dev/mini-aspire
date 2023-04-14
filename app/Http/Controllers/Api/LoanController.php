@@ -9,6 +9,7 @@ use App\Interfaces\Services\LoanServiceInterface;
 use App\Models\Loan;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Redis;
 
 class LoanController extends BaseController
 {
@@ -25,6 +26,10 @@ class LoanController extends BaseController
 
     public function list(Request $request, LoanRepositoryInterface $loanRepository)
     {
+        $request->validate([
+            'skip' => "nullable|integer|min:0",
+            'limit' => "nullable|integer|min:0",
+        ]);
         $userId = $request->user()->id;
         $skip = $request->get('skip', 0);
         $limit = $request->get('limit', 20);
@@ -44,7 +49,6 @@ class LoanController extends BaseController
         $user = $request->user();
         $request->validate(
             [
-                'request_id' => 'required|string',
                 'amount' => 'required|integer|min:10',
                 'term' => 'required|integer|min:1',
                 'date' => 'nullable|date:Y-m-d',
@@ -66,9 +70,16 @@ class LoanController extends BaseController
         return response()->json($loanService->approveLoan($id));
     }
 
-    public function getAllLoans(Request $request, LoanRepositoryInterface $loanRepository)
+    public function listAll(Request $request, LoanRepositoryInterface $loanRepository)
     {
+        $request->validate([
+            'skip' => "nullable|integer|min:0",
+            'limit' => "nullable|integer|min:0",
+        ]);
+        $this->authorize('viewAny', Loan::class);
         $skip = $request->get('skip', 0);
         $limit = $request->get('limit', 10);
+        return response()->json($loanRepository->search([], $skip, $limit));
+
     }
 }

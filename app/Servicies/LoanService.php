@@ -83,19 +83,16 @@ class LoanService implements LoanServiceInterface
     public function payRepayment($repaymentId, $amount)
     {
         $repayment = $this->loanRepaymentRepository->find($repaymentId);
-        $loan = $this->loanRepository->find($repayment->loan_id);
-        $paidAmount = $this->loanRepository->getPaidAmount($repayment->loan_id);
-        $remainAmount = $loan->amount - $paidAmount;
-        $minimumAmount = min( $remainAmount , $repayment->amount);
-        if ($amount < $minimumAmount) {
+        if ($amount < $repayment->amount) {
             throw new NotAllowException('The payment amount is not enough');
         }
         if ($repayment->status != LoanRepayment::STATUS_PENDING) {
-            throw new NotAllowException("This repayment can't not be paid");
+            throw new NotAllowException("This repayment haven't been paid");
         }
+        $loan = $this->loanRepository->find($repayment->loan_id);
         $allowsPayStatus = [Loan::STATUS_APPROVE, Loan::STATUS_PARTIAL_PAID];
         if (! in_array($loan->status, $allowsPayStatus)) {
-            throw new NotAllowException("This repayment can't not be paid");
+            throw new NotAllowException("Your loan haven't been approved");
         }
         try {
             DB::beginTransaction();
