@@ -30,10 +30,11 @@ class CreateUser extends Command
         $isAdmin = $this->option('is-admin');
         $username = $this->argument('username');
         $password = $this->argument('password');
-        if(User::query()->where('username', $username)->count()){
+        if (User::query()->where('username', $username)->count()) {
             $this->error("The username $username has been already existed");
+
             return;
-        };
+        }
         $password = Hash::make($password);
         User::factory()->create(['username' => $username, 'password' => $password, 'user_type' => $isAdmin ? User::TYPE_ADMIN : User::TYPE_CUSTOMER]);
         $this->info('User created');
