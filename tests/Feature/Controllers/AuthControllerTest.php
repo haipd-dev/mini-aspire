@@ -62,7 +62,7 @@ class AuthControllerTest extends TestCase
             'password' => 'password1',
         ]);
         $response->assertStatus(200);
-        $expireTime = config('sanctum.sanctum');
+        $expireTime = config('sanctum.expiration');
         $response->assertJson(function (AssertableJson $json) {
             $json->hasAll(['access_token', 'token_type', 'expires_in']);
         }

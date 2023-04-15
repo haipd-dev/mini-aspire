@@ -67,7 +67,7 @@ class Handler extends ExceptionHandler
             if ($request->is('api/*')) {
                 return response()->json([
                     'message' => $e->getMessage()
-                ], Response::HTTP_UNAUTHORIZED);
+                ], Response::HTTP_FORBIDDEN);
             }
         });
     }
