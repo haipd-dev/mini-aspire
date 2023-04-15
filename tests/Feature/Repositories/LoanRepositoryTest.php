@@ -6,12 +6,10 @@ use App\Exceptions\NotFoundException;
 use App\Interfaces\Repositories\LoanRepositoryInterface;
 use App\Models\Loan;
 use Database\Seeders\LoanSeeder;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
+use Tests\Feature\AbstractFeatureTest;
 
-class LoanRepositoryTest extends TestCase
+class LoanRepositoryTest extends AbstractFeatureTest
 {
-    use RefreshDatabase;
 
     /**
      * @var LoanRepositoryInterface
@@ -127,5 +125,17 @@ class LoanRepositoryTest extends TestCase
         $this->assertFalse($result);
         $this->assertDatabaseMissing('loans', ['id' => $notExistedRecordId]);
 
+    }
+
+    public function test_search_loan(){
+        $user = $this->createCustomerUser();
+//        $firstLoan = $this->generateLoan($user->id);
+//        $this->generateLoan($user->id);
+//        $this->generateLoan($user->id);
+        $result = $this->repository->search([]);
+        $this->assertCount(2, $result);
+        $result = $this->repository->search(['id' => 1]);
+        $this->assertCount(1, $result);
+//        $this->assertIsArray( $result);
     }
 }

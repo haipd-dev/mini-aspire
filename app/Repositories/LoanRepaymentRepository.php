@@ -12,13 +12,9 @@ class LoanRepaymentRepository extends BaseRepository implements LoanRepaymentRep
         return LoanRepayment::class;
     }
 
-    public function getByLoanId($loanId, $status = null)
+    public function getByLoanId($loanId)
     {
         $query = $this->_model->newQuery()->where('loan_id', $loanId);
-        if ($status) {
-            $query->where('status', $status);
-        }
-
         return $query->get();
     }
 

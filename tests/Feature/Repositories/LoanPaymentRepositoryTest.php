@@ -117,4 +117,10 @@ class LoanPaymentRepositoryTest extends TestCase
         $this->assertDatabaseMissing('loan_repayments', ['id' => $notExistedRecordId]);
         $this->assertFalse($result);
     }
+
+    public function test_mass_update_loan_repayment()
+    {
+        $this->repository->massUpdate(['loan_id' => 1], ['status' => LoanRepayment::STATUS_PAID]);
+        $this->assertDatabaseMissing('loan_repayments', ['loan_id' => 1, 'status' => LoanRepayment::STATUS_PENDING]);
+    }
 }

@@ -6,6 +6,7 @@ use App\Interfaces\Repositories\LoanRepaymentRepositoryInterface;
 use App\Interfaces\Repositories\LoanRepositoryInterface;
 use App\Models\Loan;
 use App\Models\LoanRepayment;
+use Illuminate\Support\Facades\Log;
 
 class LoanRepository extends BaseRepository implements LoanRepositoryInterface
 {
@@ -33,11 +34,11 @@ class LoanRepository extends BaseRepository implements LoanRepositoryInterface
         return $query->get();
     }
 
-    public function search($query, $skip = 0, $limit = 10)
+    public function search($search, $skip = 0, $limit = 10)
     {
         $query = $this->_model->newQuery();
-        foreach ($query as $key => $value) {
-            $query->where('key', $value);
+        foreach ($search as $key => $value) {
+            $query = $query->where($key, '=', $value);
         }
         $query->skip($skip)->limit($limit)
             ->orderBy('created_at', 'desc');

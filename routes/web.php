@@ -14,5 +14,6 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
+    /** @var  $repository  \App\Repositories\LoanRepository*/
     return 'Mini Aspire Here';
 });

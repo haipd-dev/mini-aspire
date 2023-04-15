@@ -37,19 +37,12 @@ class LoanController extends BaseController
         return response()->json($loanRepository->getByUserId($userId, $skip, $limit));
     }
 
-    public function listRepayments(Request $request, LoanRepaymentRepositoryInterface $loanRepaymentRepository)
-    {
-        $id = $request->route('id');
-        $listRepayments = $loanRepaymentRepository->getByLoanId($id);
-        return response()->json($listRepayments);
-    }
-
     public function store(Request $request, LoanServiceInterface $loanService)
     {
         $user = $request->user();
         $request->validate(
             [
-                'amount' => 'required|integer|min:10',
+                'amount' => 'required|integer|min:10|max:999999999',
                 'term' => 'required|integer|min:1',
                 'date' => 'nullable|date:Y-m-d',
             ]

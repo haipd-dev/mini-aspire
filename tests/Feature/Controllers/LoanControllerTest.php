@@ -18,33 +18,41 @@ class LoanControllerTest extends AbstractFeatureTest
         $request->assertStatus(Response::HTTP_UNAUTHORIZED);
     }
 
-    public function test_validate_carefully(){
-
-    }
     public function test_validate_when_create_loan_with_invalid_input()
     {
         /** @var $user User */
         $user = User::factory()->create();
         $token = $user->createToken('Customer Token');
         $makeHttpRequest = $this->withToken($token->plainTextToken);
-        $missingData = [
-            [],
-            [
-                'amount' => 10000,
-            ],
-            [
-                'term' => 3,
-            ],
-            [
-                'amount' => 10000,
-                'term' => 3,
-                'date' => 'some invalid date',
-            ],
+        $data = [];
+        $response = $makeHttpRequest->putJson('api/loan', $data);
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+        $response->assertInvalid(['amount', 'term']);
+        $data = [ 'amount' => 10000];
+        $response = $makeHttpRequest->putJson('api/loan', $data);
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+        $response->assertInvalid(['term']);
+        $data = ['term' => 3];
+        $response = $makeHttpRequest->putJson('api/loan', $data);
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+        $response->assertInvalid(['amount']);
+        $data = [
+            'amount' => 10000,
+            'term' => 3,
+            'date' => 'some invalid date',
         ];
-        foreach ($missingData as $data) {
-            $response = $makeHttpRequest->putJson('api/loan', $data);
-            $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
-        }
+        $response = $makeHttpRequest->putJson('api/loan', $data);
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+        $response->assertInvalid(['date']);
+
+        $data = [
+            'amount' => 1000000000,
+            'term' => 3,
+            'date' => '2022-12-23',
+        ];
+        $response = $makeHttpRequest->putJson('api/loan', $data);
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+        $response->assertInvalid(['amount']);
     }
 
     public function test_create_loan()
