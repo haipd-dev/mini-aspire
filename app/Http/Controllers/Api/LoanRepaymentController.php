@@ -15,7 +15,7 @@ class LoanRepaymentController extends Controller
         LoanRepaymentRepositoryInterface $loanRepaymentRepository
     ) {
         $request->validate([
-            'amount' => 'required|numeric',
+            'amount' => 'required|numeric|min:0.1|max:999999999',
         ]);
         $repaymentId = $request->route('id');
         $amount = $request->get('amount');
