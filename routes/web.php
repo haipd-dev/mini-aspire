@@ -14,7 +14,5 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    $loanHelper = new \App\Helpers\LoanHelper();
-    $loanHelper->calculateRepayment(500, 2, 'random string');
     return 'Mini Aspire Here';
 });
