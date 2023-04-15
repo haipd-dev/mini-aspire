@@ -5,18 +5,14 @@ namespace App\Repositories;
 use App\Interfaces\Repositories\LoanRepaymentRepositoryInterface;
 use App\Interfaces\Repositories\LoanRepositoryInterface;
 use App\Models\Loan;
-use App\Models\LoanRepayment;
-use Illuminate\Support\Facades\Log;
 
 class LoanRepository extends BaseRepository implements LoanRepositoryInterface
 {
-
     protected $loanRepaymentRepository;
 
     public function __construct(
         LoanRepaymentRepositoryInterface $loanRepaymentRepository
-    )
-    {
+    ) {
         parent::__construct();
         $this->loanRepaymentRepository = $loanRepaymentRepository;
     }
@@ -42,6 +38,7 @@ class LoanRepository extends BaseRepository implements LoanRepositoryInterface
         }
         $query->skip($skip)->limit($limit)
             ->orderBy('created_at', 'desc');
+
         return $query->get();
     }
 }

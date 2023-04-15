@@ -39,7 +39,7 @@ class LoanService implements LoanServiceInterface
             throw new InvalidInputException('The amount and the term should be larger than 0');
         }
         $checkDate = \DateTime::createFromFormat('Y-m-d', $submitDate);
-        if (!$checkDate) {
+        if (! $checkDate) {
             throw new InvalidInputException('Date format should be Y-m-d');
         }
         try {
@@ -103,6 +103,7 @@ class LoanService implements LoanServiceInterface
             $repayment = $this->loanRepaymentRepository->update($repaymentId, $updateData);
             event(new LoanRepaymentPaid($repayment));
             DB::commit();
+
             return $repayment;
         } catch (\Exception $exception) {
             DB::rollBack();

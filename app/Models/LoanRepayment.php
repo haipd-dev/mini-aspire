@@ -8,8 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 class LoanRepayment extends Model
 {
     use HasFactory;
+
     const STATUS_PENDING = 1;
+
     const STATUS_PAID = 2;
+
     const STATUS_AUTO_PAID = 3;
 
     protected $table = 'loan_repayments';
@@ -22,9 +25,10 @@ class LoanRepayment extends Model
         'paid_amount',
         'currency',
     ];
+
     protected $casts = [
-        'amount' => "double",
-        "paid_amount" => "double"
+        'amount' => 'double',
+        'paid_amount' => 'double',
     ];
 
     protected $hidden = [

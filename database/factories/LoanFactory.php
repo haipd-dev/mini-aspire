@@ -20,8 +20,8 @@ class LoanFactory extends Factory
         return [
             'submit_date' => fake()->date('Y-m-d'),
             'status' => fake()->randomElement([Loan::STATUS_PENDING, Loan::STATUS_PAID, Loan::STATUS_APPROVE]),
-            'term' => fake()->randomElement([2,3,4,5,6]),
-            'amount' => fake()->randomElement([1000,2000,5000,7000]),
+            'term' => fake()->randomElement([2, 3, 4, 5, 6]),
+            'amount' => fake()->randomElement([1000, 2000, 5000, 7000]),
         ];
     }
 }

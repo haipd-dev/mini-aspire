@@ -3,13 +3,11 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller as BaseController;
-use App\Interfaces\Repositories\LoanRepaymentRepositoryInterface;
 use App\Interfaces\Repositories\LoanRepositoryInterface;
 use App\Interfaces\Services\LoanServiceInterface;
 use App\Models\Loan;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Redis;
 
 class LoanController extends BaseController
 {
@@ -27,8 +25,8 @@ class LoanController extends BaseController
     public function list(Request $request, LoanRepositoryInterface $loanRepository)
     {
         $request->validate([
-            'skip' => "nullable|integer|min:0",
-            'limit' => "nullable|integer|min:0",
+            'skip' => 'nullable|integer|min:0',
+            'limit' => 'nullable|integer|min:0',
         ]);
         $userId = $request->user()->id;
         $skip = $request->get('skip', 0);
@@ -67,12 +65,13 @@ class LoanController extends BaseController
     public function listAll(Request $request, LoanRepositoryInterface $loanRepository)
     {
         $request->validate([
-            'skip' => "nullable|integer|min:0",
-            'limit' => "nullable|integer|min:0",
+            'skip' => 'nullable|integer|min:0',
+            'limit' => 'nullable|integer|min:0',
         ]);
         $this->authorize('viewAny', Loan::class);
         $skip = $request->get('skip', 0);
         $limit = $request->get('limit', 10);
+
         return response()->json($loanRepository->search([], $skip, $limit));
 
     }

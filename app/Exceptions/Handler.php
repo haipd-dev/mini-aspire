@@ -51,7 +51,7 @@ class Handler extends ExceptionHandler
         $this->renderable(function (NotFoundHttpException $e, Request $request) {
             if ($request->is('api/*')) {
                 return response()->json([
-                    'message' => $e->getMessage()
+                    'message' => $e->getMessage(),
                 ], Response::HTTP_NOT_FOUND);
             }
         });
@@ -59,14 +59,14 @@ class Handler extends ExceptionHandler
         $this->renderable(function (NotAllowException $e, Request $request) {
             if ($request->is('api/*')) {
                 return response()->json([
-                    'message' => $e->getMessage()
+                    'message' => $e->getMessage(),
                 ], Response::HTTP_UNPROCESSABLE_ENTITY);
             }
         });
         $this->renderable(function (AccessDeniedHttpException $e, Request $request) {
             if ($request->is('api/*')) {
                 return response()->json([
-                    'message' => $e->getMessage()
+                    'message' => $e->getMessage(),
                 ], Response::HTTP_FORBIDDEN);
             }
         });

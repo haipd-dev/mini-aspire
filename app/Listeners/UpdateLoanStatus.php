@@ -15,10 +15,9 @@ class UpdateLoanStatus
     protected $loanRepaymentRepository;
 
     public function __construct(
-        LoanRepositoryInterface          $loanRepository,
+        LoanRepositoryInterface $loanRepository,
         LoanRepaymentRepositoryInterface $loanRepaymentRepository
-    )
-    {
+    ) {
         $this->loanRepository = $loanRepository;
         $this->loanRepaymentRepository = $loanRepaymentRepository;
     }

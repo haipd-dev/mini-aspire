@@ -10,7 +10,6 @@ use Tests\Feature\AbstractFeatureTest;
 
 class LoanRepositoryTest extends AbstractFeatureTest
 {
-
     /**
      * @var LoanRepositoryInterface
      */
@@ -127,7 +126,8 @@ class LoanRepositoryTest extends AbstractFeatureTest
 
     }
 
-    public function test_search_loan(){
+    public function test_search_loan()
+    {
         $user = $this->createCustomerUser();
 //        $firstLoan = $this->generateLoan($user->id);
 //        $this->generateLoan($user->id);

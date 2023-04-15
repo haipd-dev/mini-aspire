@@ -15,6 +15,7 @@ class LoanRepaymentRepository extends BaseRepository implements LoanRepaymentRep
     public function getByLoanId($loanId)
     {
         $query = $this->_model->newQuery()->where('loan_id', $loanId);
+
         return $query->get();
     }
 

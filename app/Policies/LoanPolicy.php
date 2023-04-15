@@ -33,7 +33,6 @@ class LoanPolicy
      */
     public function create(User $user): bool
     {
-        return  $user->user_type == User::TYPE_CUSTOMER;
+        return $user->user_type == User::TYPE_CUSTOMER;
     }
-
 }

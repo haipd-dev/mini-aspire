@@ -32,6 +32,6 @@ class CreateUser extends Command
         $password = $this->argument('password');
         $password = Hash::make($password);
         User::factory()->create(['username' => $username, 'password' => $password, 'user_type' => $isAdmin ? User::TYPE_ADMIN : User::TYPE_CUSTOMER]);
-        $this->info("User created");
+        $this->info('User created');
     }
 }

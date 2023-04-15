@@ -28,7 +28,7 @@ class LoanControllerTest extends AbstractFeatureTest
         $response = $makeHttpRequest->putJson('api/loan', $data);
         $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
         $response->assertInvalid(['amount', 'term']);
-        $data = [ 'amount' => 10000];
+        $data = ['amount' => 10000];
         $response = $makeHttpRequest->putJson('api/loan', $data);
         $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
         $response->assertInvalid(['term']);
@@ -143,7 +143,6 @@ class LoanControllerTest extends AbstractFeatureTest
         $response->assertStatus(Response::HTTP_NOT_FOUND);
     }
 
-
     public function test_unprocessable_entity_when_approve_approved_reject_and_paid_loan()
     {
         $adminUser = User::factory()->create(['user_type' => User::TYPE_ADMIN]);
@@ -170,71 +169,79 @@ class LoanControllerTest extends AbstractFeatureTest
         $response->assertJsonPath('status', Loan::STATUS_APPROVE);
     }
 
-
-    public function test_unauthorized_for_non_or_invalid_token_to_get_loan_list(){
+    public function test_unauthorized_for_non_or_invalid_token_to_get_loan_list()
+    {
         $response = $this->getJson('api/loan/list');
         $response->assertStatus(Response::HTTP_UNAUTHORIZED);
-        $response = $this->withToken("Some random token")->getJson('api/loan/list');
+        $response = $this->withToken('Some random token')->getJson('api/loan/list');
         $response->assertStatus(Response::HTTP_UNAUTHORIZED);
     }
 
-    public function test_limit_and_skip_is_validated_when_get_list_loans(){
+    public function test_limit_and_skip_is_validated_when_get_list_loans()
+    {
         $invalidData = [
-            'limit' => "wrong_limit",
-            'skip' => "wrong_skip"
+            'limit' => 'wrong_limit',
+            'skip' => 'wrong_skip',
         ];
         $customer = $this->createCustomerUser();
-        $token = $customer->createToken("User Token");
+        $token = $customer->createToken('User Token');
         $response = $this->withToken($token->plainTextToken)->getJson('api/loan/list?'.http_build_query($invalidData));
         $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
         $response->assertInvalid(['limit', 'skip']);
     }
-    public function test_customer_should_not_see_other_loans(){
+
+    public function test_customer_should_not_see_other_loans()
+    {
         $customer = $this->createCustomerUser();
         $this->generateLoan($customer->id);
         $customer2 = $this->createCustomerUser();
         $this->generateLoan($customer2->id);
-        $token = $customer->createToken("User Token");
+        $token = $customer->createToken('User Token');
         $response = $this->withToken($token->plainTextToken)->getJson('api/loan/list');
         $response->assertStatus(Response::HTTP_OK);
         $response->assertJsonCount(1);
     }
-    public function test_customer_get_right_loans(){
+
+    public function test_customer_get_right_loans()
+    {
         $customer = $this->createCustomerUser();
         $this->generateLoan($customer->id);
         $this->generateLoan($customer->id);
-        $token = $customer->createToken("User Token");
+        $token = $customer->createToken('User Token');
         $response = $this->withToken($token->plainTextToken)->getJson('api/loan/list');
         $response->assertStatus(Response::HTTP_OK);
         $response->assertJsonCount(2);
     }
 
-    public function test_the_number_or_loans_is_limit(){
+    public function test_the_number_or_loans_is_limit()
+    {
         $customer = $this->createCustomerUser();
         $this->generateLoan($customer->id);
         $this->generateLoan($customer->id);
-        $token = $customer->createToken("User Token");
+        $token = $customer->createToken('User Token');
         $response = $this->withToken($token->plainTextToken)->getJson('api/loan/list?limit=1');
         $response->assertStatus(Response::HTTP_OK);
         $response->assertJsonCount(1);
     }
 
-
-    public function test_unauthorized_when_no_token_or_invalid_token_admin_list(){
+    public function test_unauthorized_when_no_token_or_invalid_token_admin_list()
+    {
         $request = $this->getJson('api/admin/loan/list', []);
         $request->assertStatus(Response::HTTP_UNAUTHORIZED);
-        $request = $this->withToken("Random token")->getJson('api/admin/loan/list', []);
+        $request = $this->withToken('Random token')->getJson('api/admin/loan/list', []);
         $request->assertStatus(Response::HTTP_UNAUTHORIZED);
     }
 
-    public function test_prevent_user_from_admin_loan_list(){
+    public function test_prevent_user_from_admin_loan_list()
+    {
         $user = $this->createCustomerUser();
         $token = $user->createToken('User token');
         $request = $this->withToken($token->plainTextToken)->getJson('api/admin/loan/list', []);
         $request->assertStatus(Response::HTTP_FORBIDDEN);
     }
 
-    public function test_admin_see_the_user_list(){
+    public function test_admin_see_the_user_list()
+    {
         $admin = $this->createAdminUser();
         $user = $this->createCustomerUser();
         $this->generateLoan($user->id);

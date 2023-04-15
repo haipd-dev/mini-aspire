@@ -11,7 +11,7 @@ docker run --rm \
     composer install --ignore-platform-reqs
 ```
 4. Cd to your project folder copy .env.example file to .env file in the project folder
-5. Run sail up to start container
+5. Run sail up to start container. Please change/add APP_PORT,FORWARD_DB_PORT,FORWARD_REDIS_PORT in case the default port is using by other applications in your environment
 ```
 ./vendor/bin/sail up -d
 ```
@@ -26,6 +26,7 @@ docker run --rm \
 ./vendor/bin/sail artisan user:create username password --is-admin
 
 ```
+8. The postman collection is included in the project. The application will be available in http://localhost:8888 in default. Please fix it if you change the port. Add base_url param to in your post man to start testing.
 # Please check the detail document of project here
 
 [Document](https://docs.google.com/document/d/10mcqWKGE-ZKGJPQCgi-UtVisXmG0GeNOBhD8AJD-gjw/edit?usp=sharing).
