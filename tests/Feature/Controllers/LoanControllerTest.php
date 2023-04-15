@@ -218,4 +218,31 @@ class LoanControllerTest extends AbstractFeatureTest
         $response->assertStatus(Response::HTTP_OK);
         $response->assertJsonCount(1);
     }
+
+
+    public function test_unauthorized_when_no_token_or_invalid_token_admin_list(){
+        $request = $this->getJson('api/admin/loan/list', []);
+        $request->assertStatus(Response::HTTP_UNAUTHORIZED);
+        $request = $this->withToken("Random token")->getJson('api/admin/loan/list', []);
+        $request->assertStatus(Response::HTTP_UNAUTHORIZED);
+    }
+
+    public function test_prevent_user_from_admin_loan_list(){
+        $user = $this->createCustomerUser();
+        $token = $user->createToken('User token');
+        $request = $this->withToken($token->plainTextToken)->getJson('api/admin/loan/list', []);
+        $request->assertStatus(Response::HTTP_FORBIDDEN);
+    }
+
+    public function test_admin_see_the_user_list(){
+        $admin = $this->createAdminUser();
+        $user = $this->createCustomerUser();
+        $this->generateLoan($user->id);
+        $this->generateLoan($user->id);
+        $token = $admin->createToken('User token');
+        $request = $this->withToken($token->plainTextToken)->getJson('api/admin/loan/list', []);
+        $request->assertStatus(Response::HTTP_OK);
+        $request->assertJsonCount(2);
+
+    }
 }

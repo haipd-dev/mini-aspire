@@ -36,11 +36,4 @@ class LoanPolicy
         return  $user->user_type == User::TYPE_CUSTOMER;
     }
 
-    /**
-     * Determine whether the user can update the model.
-     */
-    public function update(User $user, Loan $loan): bool
-    {
-        return $user->id == $loan->user_id;
-    }
 }

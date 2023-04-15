@@ -14,7 +14,7 @@ class LoanHelper
         }
         $avgAmount = round($amount / $term, 2);
         $date = \DateTime::createFromFormat('Y-m-d', $requestDate);
-        if (! $date) {
+        if (!$date) {
             throw new InvalidInputException('Date format should be Y-m-d');
         }
         $dateInterval = \DateInterval::createFromDateString('7 day');
