@@ -31,7 +31,7 @@ class CreateUser extends Command
         $username = $this->argument('username');
         $password = $this->argument('password');
         if(User::query()->where('username', $username)->count()){
-            $this->error("The username $username have already existed");
+            $this->error("The username $username has been already existed");
             return;
         };
         $password = Hash::make($password);
